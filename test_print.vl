@@ -1,3 +1,0 @@
-tb mau = 100
-tb giap = 50
-in(mau + giap * 2)
