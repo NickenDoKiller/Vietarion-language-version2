@@ -1,0 +1,12 @@
+tb mau = 20
+in("==== VIETARION GAME ====")
+lap mau > 0 {
+  tb st = ngaunhien()
+  in("An don: ")
+  in(st)
+  
+  mau = mau - st
+  in("Mau hien tai: ")
+  in(mau)
+}
+in("GAME OVER! QUAI VAT DA CHET.")

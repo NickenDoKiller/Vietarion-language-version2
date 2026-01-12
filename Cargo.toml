@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "crates/vl_core",
+    "crates/vl_bytecode",
+    "crates/vl_vm",
+    "src/vl_cli",
+]
+resolver = "2"

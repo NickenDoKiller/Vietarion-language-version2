@@ -1,0 +1,7 @@
+#[{}]
+tb x: nguyen = 10
+tb y: nguyen = 20
+neu x < y {
+    in("Vietarion xin chao!")
+}
+#[end]

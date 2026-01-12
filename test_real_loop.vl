@@ -1,0 +1,5 @@
+tb i = 1
+lap i < 4 {
+  in(i)
+  tb i = i + 1
+}
