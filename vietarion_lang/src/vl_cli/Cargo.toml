@@ -1,0 +1,11 @@
+[package]
+name = "vl_cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+vl_core = { path = "../../crates/vl_core" }
+vl_bytecode = { path = "../../crates/vl_bytecode" }
+vl_vm = { path = "../../crates/vl_vm" }
+clap = { version = "4.0", features = ["derive"] } # Để parse argument command line
+colored = "2.0" # Để in màu error

@@ -1,0 +1,4 @@
+tb mau = 0
+neu mau == 0 {
+  in(999)
+}
