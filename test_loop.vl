@@ -1,5 +1,0 @@
-tb i = 5
-lap i == 5 {
-  in(i)
-  tb i = 1
-}
