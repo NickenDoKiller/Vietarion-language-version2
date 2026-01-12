@@ -1,73 +1,54 @@
 use std::collections::HashMap;
+use rand::Rng;
 
-pub struct Chunk {
-    pub code: Vec<u8>,
-    pub constants: Vec<f64>,
-    pub names: Vec<String>,
-}
+#[derive(Debug, Clone, PartialEq)]
+pub enum Value { Number(f64), Str(String) }
 
-impl Clone for Chunk {
-    fn clone(&self) -> Self {
-        Self { code: self.code.clone(), constants: self.constants.clone(), names: self.names.clone() }
-    }
-}
+#[derive(Debug, Clone)]
+pub struct Chunk { pub code: Vec<u8>, pub constants: Vec<Value>, pub names: Vec<String> }
 
-pub struct VM {
-    stack: Vec<f64>,
-    globals: HashMap<String, f64>,
-}
+pub struct VM { stack: Vec<Value>, globals: HashMap<String, Value> }
 
 impl VM {
     pub fn new() -> Self { Self { stack: Vec::new(), globals: HashMap::new() } }
+    fn pop(&mut self) -> Value { self.stack.pop().unwrap_or(Value::Number(0.0)) }
+
     pub fn run(&mut self, chunk: Chunk) {
         let mut ip = 0;
-        while ip < chunk.code.len() {
-            let inst = chunk.code[ip]; ip += 1;
+        let code = &chunk.code;
+        while ip < code.len() {
+            let inst = code[ip]; ip += 1;
             match inst {
-                0 => break, // Halt
-                1 => { // Constant
-                    if let Some(&val) = chunk.constants.get(chunk.code[ip] as usize) {
-                        self.stack.push(val); ip += 1;
+                0 => break,
+                1 => { let idx = code[ip] as usize; ip += 1; self.stack.push(chunk.constants[idx].clone()); }
+                2 => { // Lệnh cộng (+)
+                    let b = self.pop(); let a = self.pop();
+                    match (a, b) {
+                        (Value::Number(n1), Value::Number(n2)) => self.stack.push(Value::Number(n1 + n2)),
+                        (Value::Str(s1), Value::Str(s2)) => self.stack.push(Value::Str(format!("{}{}", s1, s2))),
+                        (Value::Str(s1), Value::Number(n2)) => self.stack.push(Value::Str(format!("{}{}", s1, n2))),
+                        (Value::Number(n1), Value::Str(s2)) => self.stack.push(Value::Str(format!("{}{}", n1, s2))),
                     }
                 }
-                2..=5 | 9 | 12 | 13 => { // Các phép toán 2 ngôi (+, -, *, ==, >, <)
-                    if self.stack.len() < 2 { continue; }
-                    let b = self.stack.pop().unwrap();
-                    let a = self.stack.pop().unwrap();
-                    let res = match inst {
-                        2 => a + b,
-                        3 => a - b,
-                        4 => a * b,
-                        5 => a / b,
-                        9 => if a == b { 1.0 } else { 0.0 },
-                        12 => if a > b { 1.0 } else { 0.0 },
-                        13 => if a < b { 1.0 } else { 0.0 },
-                        _ => 0.0,
-                    };
-                    self.stack.push(res);
-                }
-                6 => { // Store Global
-                    let idx = chunk.code[ip] as usize; ip += 1;
-                    if let Some(val) = self.stack.pop() {
-                        self.globals.insert(chunk.names[idx].clone(), val);
+                3 => { let b = self.pop(); let a = self.pop(); if let (Value::Number(n1), Value::Number(n2)) = (a, b) { self.stack.push(Value::Number(n1 - n2)); } }
+                6 => { let idx = code[ip] as usize; ip += 1; let val = self.pop(); self.globals.insert(chunk.names[idx].clone(), val); }
+                7 => { let idx = code[ip] as usize; ip += 1; let val = self.globals.get(&chunk.names[idx]).cloned().unwrap_or(Value::Number(0.0)); self.stack.push(val); }
+                8 => { 
+                    let val = self.pop(); 
+                    match val { 
+                        Value::Number(n) => println!("💬 [Vietarion]: {}", n), 
+                        Value::Str(s) => println!("💬 [Vietarion]: {}", s) 
                     }
                 }
-                7 => { // Load Global
-                    let idx = chunk.code[ip] as usize; ip += 1;
-                    let val = self.globals.get(&chunk.names[idx]).cloned().unwrap_or(0.0);
-                    self.stack.push(val);
-                }
-                8 => { // Print
-                    if let Some(val) = self.stack.pop() { println!("💬 [Vietarion]: {}", val); }
-                }
-                10 => { // Jump If False
-                    let offset = chunk.code[ip] as usize; ip += 1;
-                    let cond = self.stack.pop().unwrap_or(0.0);
-                    if cond == 0.0 { ip += offset; }
-                }
-                11 => { // Jump Back
-                    let offset = chunk.code[ip] as usize;
-                    ip = ip - offset - 1;
+                10 => { let target = code[ip] as usize; ip += 1; let cond = match self.pop() { Value::Number(n) => n, _ => 0.0 }; if cond == 0.0 { ip = target; } }
+                11 => { ip = code[ip] as usize; }
+                12 => { let b = self.pop(); let a = self.pop(); if let (Value::Number(n1), Value::Number(n2)) = (a, b) { self.stack.push(Value::Number(if n1 > n2 { 1.0 } else { 0.0 })); } }
+                14 => { self.pop(); }
+                15 => { 
+                    let mut rng = rand::thread_rng();
+                    // Sửa lỗi ambiguous: gọi rõ ràng kiểu f64
+                    let val: f64 = rng.gen_range(1.0f64..11.0f64).floor();
+                    self.stack.push(Value::Number(val));
                 }
                 _ => {}
             }
