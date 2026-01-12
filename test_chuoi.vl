@@ -1,4 +1,0 @@
-tb ten = "Mày"
-tb chao = "Chào "
-in(chao + ten)
-in("Vietarion dang chay tren Linux Mint XFCE!")
