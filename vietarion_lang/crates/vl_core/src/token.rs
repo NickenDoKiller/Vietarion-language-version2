@@ -1,14 +1,14 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
-    TB, LAP, IN, NGAUNHIEN,
-    Identifier(String), Str(String), Int(i64),
-    Plus, Minus, Gt, Lt, Assign,
-    LParen, RParen, LBrace, RBrace,
+    TB, LAP, IN, NGAUNHIEN, NEU, NGUOC_LAI, TH, DOC_FILE,
+    PLUS, MINUS, GT, LT, BANG,
+    LPAREN, RPAREN, LBRACE, RBRACE, COMMA,
+    TEN(String), CHUOI(String), Int(f64),
     EOF
 }
 
 #[derive(Debug, Clone)]
 pub struct Token {
     pub kind: TokenType,
-    pub line: usize,
+    pub lexeme: String,
 }

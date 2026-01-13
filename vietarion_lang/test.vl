@@ -1,0 +1,7 @@
+#[ime]
+in("Day la vung uu tien")
+#[{
+  tb a = 10
+  in(a)
+}]
+#[end]

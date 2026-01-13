@@ -11,7 +11,8 @@ pub enum Expr {
 #[derive(Debug, Clone)]
 pub enum Stmt {
     VarDecl { name: String, init: Expr },
-    If { condition: Expr, then_branch: Vec<Stmt>, else_branch: Option<Vec<Stmt>> },
     While { condition: Expr, body: Vec<Stmt> },
+    If { condition: Expr, then_branch: Vec<Stmt>, else_branch: Option<Vec<Stmt>> },
+    Function { name: String, params: Vec<String>, body: Vec<Stmt> },
     Expression(Expr),
 }

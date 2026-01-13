@@ -1,0 +1,6 @@
+xoa()
+in("--- VIETARION SOURCE MANAGER ---")
+tb cmd = "ls -la"
+in("Dang quet cac file trong thu muc:")
+// Neu may da implement ham he_thong() thi goi o day
+in("Xong! He thong san sang self-hosting.")
